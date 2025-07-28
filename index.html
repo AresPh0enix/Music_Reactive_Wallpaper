@@ -56,5 +56,38 @@
   <!-- Libraries and script -->
   <script src="assets/ColorThief.js"></script>
   <script src="script.js"></script>
+  <script>
+  const token = localStorage.getItem("spotifyToken");
+
+  if (!token) {
+    document.body.innerHTML = `
+      <h1>Autenticazione richiesta</h1>
+      <p>Non ho trovato alcun token. Devo rimandarti al login.</p>
+    `;
+    setTimeout(() => {
+      window.location.href = "https://accounts.spotify.com/authorize?client_id=YOUR_CLIENT_ID&response_type=code&redirect_uri=YOUR_REDIRECT_URI&scope=user-read-playback-state";
+    }, 3000); // Attendi 3 secondi prima di redirect
+  } else {
+    // Procedi con la fetch delle info musicali
+    fetch("https://api.spotify.com/v1/me/player/currently-playing", {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.body.innerHTML = `
+        <h1>🎶 In riproduzione</h1>
+        <p><strong>${data.item.name}</strong> di ${data.item.artists.map(artist => artist.name).join(", ")}</p>
+      `;
+    })
+    .catch(error => {
+      document.body.innerHTML = `
+        <h1>Errore API</h1>
+        <p>${error.message}</p>
+      `;
+    });
+  }
+</script>
 </body>
 </html>
