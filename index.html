@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <script>
+  const clientId = "dba648df53354f2c9eb79b293efd2f7b";
+  const redirectUri = "https://aresph0enix.github.io/Music_Reactive_Wallpaper/";
+  const scopes = "user-read-playback-state user-read-currently-playing";
+
+  const authEndpoint = "https://accounts.spotify.com/authorize";
+  const loginUrl = `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&response_type=token`;
+
+  window.onload = () => {
+    if (!window.location.hash) {
+      window.location = loginUrl;
+    }
+  };
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Spotify Reactive Wallpaper</title>
