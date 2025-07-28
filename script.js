@@ -1,87 +1,56 @@
-// Selection of the DOM
 const canvas = document.getElementById("audioCanvas");
 const ctx = canvas.getContext("2d");
-const albumArt = document.getElementById("album-art");
-const songTitle = document.getElementById("song-title");
-const artistName = document.getElementById("artist-name");
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
 
-// Initial color of the waves
-let waveColor = "#1DB954"; // Green Spotify
-let t = 0;
+let audioCtx, analyser, source;
+let bufferLength, dataArray;
 
-// 🌊 Animazione fluida canvas
-function drawFluidWaves() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.beginPath();
+function setupAudio() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  bufferLength = analyser.frequencyBinCount;
+  dataArray = new Uint8Array(bufferLength);
 
-  for (let i = 0; i < canvas.width; i += 2) {
-    let y = canvas.height / 2 +
-      80 * Math.sin(i * 0.01 + t) *
-      Math.sin(t * 0.02);
-    ctx.lineTo(i, y);
-  }
-
-  ctx.strokeStyle = waveColor;
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  t += 0.6;
-
-  requestAnimationFrame(drawFluidWaves);
-}
-drawFluidWaves();
-
-// Fetch the track from Spotify
-async function fetchCurrentTrack() {
-  const token = localStorage.getItem("spotifyToken");
-  if (!token) return;
-
-  const response = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
-    headers: { Authorization: "Bearer " + token }
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    source = audioCtx.createMediaStreamSource(stream);
+    source.connect(analyser);
+    animate();
   });
+}
 
-  if (response.ok) {
-    const data = await response.json();
-    if (!data || !data.item) return;
+function animate() {
+  requestAnimationFrame(animate);
+  analyser.getByteFrequencyData(dataArray);
 
-    const track = {
-      title: data.item.name,
-      artist: data.item.artists[0].name,
-      cover: data.item.album.images[0].url
-    };
-    updateTrackInfo(track);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background gradient
+  const gradient = ctx.createRadialGradient(
+    canvas.width / 2, canvas.height / 2, 0,
+    canvas.width / 2, canvas.height / 2, canvas.width
+  );
+  gradient.addColorStop(0, "rgba(0,10,30,0.5)");
+  gradient.addColorStop(1, "rgba(0,0,0,1)");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Liquid blobs
+  for (let i = 0; i < dataArray.length; i++) {
+    const radius = dataArray[i] / 2;
+    const angle = (i / bufferLength) * Math.PI * 2;
+    const x = canvas.width / 2 + Math.cos(angle) * 200;
+    const y = canvas.height / 2 + Math.sin(angle) * 200;
+
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${i * 3}, 100%, 50%, 0.7)`;
+    ctx.fill();
   }
 }
 
-// Updates the UI and the color of the waves
-function updateTrackInfo(track) {
-  if (songTitle.textContent !== track.title) {
-    t += 20; // Impulso all'onda al cambio traccia
-  }
-
-  albumArt.src = track.cover;
-  songTitle.textContent = track.title;
-  artistName.textContent = track.artist;
-
-  const img = new Image();
-  img.crossOrigin = "Anonymous";
-  img.src = track.cover;
-
-  img.onload = function () {
-    const colorThief = new ColorThief();
-    const dominantColor = colorThief.getColor(img);
-    waveColor = `rgb(${dominantColor.join(",")})`;
-  };
-}
-
-// Start fetch periodically
-setInterval(fetchCurrentTrack, 5000);
+window.onload = setupAudio;
 
 setInterval(fetchCurrentTrack, 5000); // Update every 5 seconds
 
