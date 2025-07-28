@@ -1,0 +1,62 @@
+/* Font & base */
+body {
+  margin: 0;
+  background-color: #000000;
+  font-family: 'Montserrat', sans-serif;
+  overflow: hidden;
+}
+
+/* Container principale */
+#wallpaper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Canvas onde fluide */
+#audioCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Informazioni brano */
+#track-info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+  color: #ffffff;
+}
+
+/* Copertina album */
+#album-art {
+  width: 220px;
+  height: 220px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  margin-bottom: 25px;
+}
+
+/* Titolo del brano */
+#song-title {
+  font-size: 2.6rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: 0.8px;
+}
+
+/* Artista */
+#artist-name {
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-top: 8px;
+  opacity: 0.8;
+  letter-spacing: 1px;
+}
