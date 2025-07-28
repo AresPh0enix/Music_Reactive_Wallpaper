@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Autenticazione completata</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <h1>Autenticazione completata!</h1>
+  <p>Reindirizzamento in corso...</p>
+
+  <script>
+    // Estrae il ?code= dall'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+
+    if (code) {
+      // Salva il codice localmente
+      localStorage.setItem('spotify_auth_code', code);
+
+      // Reindirizza alla pagina principale
+      window.location.href = "/";
+    } else {
+      document.body.innerHTML = "<h1>Errore: codice non trovato</h1>";
+    }
+  </script>
+</body>
+</html>
