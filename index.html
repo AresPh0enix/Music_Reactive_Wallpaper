@@ -8,7 +8,7 @@
   const scopes = "user-read-playback-state user-read-currently-playing";
 
   const authEndpoint = "https://accounts.spotify.com/authorize";
-  const loginUrl = `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&response_type=token`;
+  const loginUrl = `${authEndpoint}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&response_type=code`;
 
   window.onload = () => {
     if (!window.location.hash) {
