@@ -3,19 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Music Reactive Wallpaper</title>
+  <title>Spotify Reactive Wallpaper</title>
   <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div id="wallpaper">
+    <!-- Canvas animato per onde fluide -->
     <canvas id="audioCanvas"></canvas>
+
+    <!-- Sezione centrale con copertina e metadati -->
     <div id="track-info">
-      <img id="album-art" src="default_cover.jpg" alt="Album Art" />
-      <h2 id="song-title">Titolo</h2>
-      <p id="artist-name">Artista</p>
+      <img id="album-art" src="assets/default_cover.jpg" alt="Copertina Album" />
+      <h1 id="song-title">Titolo del brano</h1>
+      <h2 id="artist-name">Artista</h2>
     </div>
   </div>
 
+  <!-- Librerie e script -->
   <script src="assets/ColorThief.js"></script>
   <script src="script.js"></script>
 </body>
