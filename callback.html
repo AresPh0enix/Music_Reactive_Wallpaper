@@ -34,6 +34,10 @@
     } else {
       document.body.innerHTML = "<h1>Errore: codice non trovato</h1>";
     }
+    <script>
+  const token = window.location.hash.split("&")[0].split("=")[1];
+  localStorage.setItem("spotifyToken", token);
+  window.location.href = "index.html"; // Torna al sito principale
   </script>
 </body>
 </html>
