@@ -50,7 +50,7 @@ class Particle {
 
   draw() {
     ctx.beginPath();
-    ctx.fillStyle = `hsla(${this.hue}, 100%, 50%, ${this.alpha})`;
+    ctx.fillStyle = `rgba(${dominantColor.join(",")}, 0.6)`;
     ctx.shadowBlur = 25;
     ctx.shadowColor = `hsla(${this.hue}, 100%, 70%, 0.6)`;
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
