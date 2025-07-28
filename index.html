@@ -14,6 +14,24 @@
       window.location = loginUrl;
     }
   };
+  async function fetchCurrentTrack() {
+    const token = localStorage.getItem("spotifyToken");
+    const response = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
+      headers: { Authorization: "Bearer " + token }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const track = data.item.name;
+      const artist = data.item.artists[0].name;
+      const albumArt = data.item.album.images[0].url;
+
+      document.getElementById("track").innerText = `${track} - ${artist}`;
+      document.getElementById("art").src = albumArt;
+    }
+  }
+
+  setInterval(fetchCurrentTrack, 5000); // Aggiorna ogni 5 secondi
 </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -38,4 +56,6 @@
   <script src="assets/ColorThief.js"></script>
   <script src="script.js"></script>
 </body>
+  <div id="track">🎵 Nessuna traccia</div>
+<img id="art" src="" alt="Copertina album" />
 </html>
