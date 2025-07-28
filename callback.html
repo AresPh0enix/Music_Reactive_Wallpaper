@@ -41,7 +41,7 @@
       .then(data => {
         if (data.access_token) {
           localStorage.setItem("spotifyToken", data.access_token);
-          window.location.href = "index.html"; // Goes back to the visualizer
+          window.location.href = "https://aresph0enix.github.io/Music_Reactive_Wallpaper/index.html"; // Goes back to the visualizer
         } else {
           document.body.innerHTML = "<h1>Errore nell’autenticazione</h1><p>" + JSON.stringify(data) + "</p>";
         }
