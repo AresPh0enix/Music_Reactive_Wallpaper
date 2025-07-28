@@ -48,6 +48,10 @@ const mockTrack = {
 
 // Aggiorna UI
 function updateTrackInfo(track) {
+  if (songTitle.textContent !== track.title) {
+    t += Math.random() * 20; // Boost temporaneo all'animazione
+  }
+
   albumArt.src = track.cover;
   songTitle.textContent = track.title;
   artistName.textContent = track.artist;
@@ -62,6 +66,25 @@ function updateTrackInfo(track) {
     waveColor = `rgb(${dominantColor.join(",")})`;
   };
 }
+
+async function fetchCurrentTrack() {
+  const token = localStorage.getItem("spotifyToken");
+  const response = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
+    headers: { Authorization: "Bearer " + token }
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    const track = {
+      title: data.item.name,
+      artist: data.item.artists[0].name,
+      cover: data.item.album.images[0].url
+    };
+    updateTrackInfo(track);
+  }
+}
+
+setInterval(fetchCurrentTrack, 5000); // Aggiornamento ogni 5 sec
 
 // Avvia simulazione
 updateTrackInfo(mockTrack);
