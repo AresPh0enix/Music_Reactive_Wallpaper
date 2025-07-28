@@ -2,6 +2,15 @@ const canvas = document.getElementById("audioCanvas");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+const img = document.getElementById("album-art");
+const colorThief = new ColorThief();
+
+img.addEventListener("load", () => {
+  const dominantColor = colorThief.getColor(img); // es. [r,g,b]
+
+  // Esempio: cambia sfondo liquido in base al colore
+  canvas.style.background = `radial-gradient(circle, rgba(${dominantColor.join(",")},0.4), black)`;
+});
 
 let audioCtx, analyser, source;
 let bufferLength, dataArray;
