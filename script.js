@@ -6,6 +6,8 @@ canvas.height = window.innerHeight;
 let audioCtx, analyser, source;
 let bufferLength, dataArray;
 
+let particles = [];
+
 function setupAudio() {
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();
@@ -20,39 +22,137 @@ function setupAudio() {
   });
 }
 
-function animate() {
-  requestAnimationFrame(animate);
-  analyser.getByteFrequencyData(dataArray);
+class Particle {
+  constructor(x, y, radius, hue) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.hue = hue;
+    this.vx = Math.random() * 2 - 1;
+    this.vy = Math.random() * 2 - 1;
+    this.alpha = 0.8;
+  }
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.alpha -= 0.005;
+  }
 
-  // Background gradient
-  const gradient = ctx.createRadialGradient(
-    canvas.width / 2, canvas.height / 2, 0,
-    canvas.width / 2, canvas.height / 2, canvas.width
-  );
-  gradient.addColorStop(0, "rgba(0,10,30,0.5)");
-  gradient.addColorStop(1, "rgba(0,0,0,1)");
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Liquid blobs
-  for (let i = 0; i < dataArray.length; i++) {
-    const radius = dataArray[i] / 2;
-    const angle = (i / bufferLength) * Math.PI * 2;
-    const x = canvas.width / 2 + Math.cos(angle) * 200;
-    const y = canvas.height / 2 + Math.sin(angle) * 200;
-
+  draw() {
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = `hsla(${i * 3}, 100%, 50%, 0.7)`;
+    ctx.fillStyle = `hsla(${this.hue}, 100%, 50%, ${this.alpha})`;
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = `hsla(${this.hue}, 100%, 70%, 0.6)`;
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
   }
 }
 
+function animate() {
+  requestAnimationFrame(animate);
+  analyser.getByteFrequencyData(dataArray);
+
+  ctx.fillStyle = "rgba(0,0,0,0.2)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+
+  for (let i = 0; i < bufferLength; i++) {
+    const radius = dataArray[i] / 4;
+    const angle = (i / bufferLength) * Math.PI * 2;
+    const x = centerX + Math.cos(angle) * 200;
+    const y = centerY + Math.sin(angle) * 200;
+    const hue = i * 3;
+
+    particles.push(new Particle(x, y, radius, hue));
+  }
+
+  particles.forEach((p, index) => {
+    p.update();
+    p.draw();
+    if (p.alpha <= 0) particles.splice(index, 1);
+  });
+}
+
 window.onload = setupAudio;
+const canvas = document.getElementById("audioCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-setInterval(fetchCurrentTrack, 5000); // Update every 5 seconds
+let audioCtx, analyser, source;
+let bufferLength, dataArray;
 
-// Start the simulation
-updateTrackInfo(mockTrack);
+let particles = [];
+
+function setupAudio() {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  bufferLength = analyser.frequencyBinCount;
+  dataArray = new Uint8Array(bufferLength);
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    source = audioCtx.createMediaStreamSource(stream);
+    source.connect(analyser);
+    animate();
+  });
+}
+
+class Particle {
+  constructor(x, y, radius, hue) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.hue = hue;
+    this.vx = Math.random() * 2 - 1;
+    this.vy = Math.random() * 2 - 1;
+    this.alpha = 0.8;
+  }
+
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.alpha -= 0.005;
+  }
+
+  draw() {
+    ctx.beginPath();
+    ctx.fillStyle = `hsla(${this.hue}, 100%, 50%, ${this.alpha})`;
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = `hsla(${this.hue}, 100%, 70%, 0.6)`;
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  analyser.getByteFrequencyData(dataArray);
+
+  ctx.fillStyle = "rgba(0,0,0,0.2)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+
+  for (let i = 0; i < bufferLength; i++) {
+    const radius = dataArray[i] / 4;
+    const angle = (i / bufferLength) * Math.PI * 2;
+    const x = centerX + Math.cos(angle) * 200;
+    const y = centerY + Math.sin(angle) * 200;
+    const hue = i * 3;
+
+    particles.push(new Particle(x, y, radius, hue));
+  }
+
+  particles.forEach((p, index) => {
+    p.update();
+    p.draw();
+    if (p.alpha <= 0) particles.splice(index, 1);
+  });
+}
+
+window.onload = setupAudio;
