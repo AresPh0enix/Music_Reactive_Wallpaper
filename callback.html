@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Autenticazione completata</title>
+  <meta charset="UTF-8">
+  <title>Authentication Completed</title>
   <style>
     body {
       background-color: #000;
@@ -17,27 +17,41 @@
   </style>
 </head>
 <body>
-  <h1>Autenticazione completata!</h1>
-  <p>Reindirizzamento in corso...</p>
+  <h1>Authentication Completed!</h1>
+  <p>I am receiving the token from Spotify...</p>
 
   <script>
-    // Estrae il ?code= dall'URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
+    const code = new URLSearchParams(window.location.search).get("code");
 
     if (code) {
-      // Salva il codice localmente
-      localStorage.setItem('spotify_auth_code', code);
-
-      // Reindirizza alla pagina principale
-      window.location.href = "/";
+      // Costruisci richiesta POST al token endpoint
+      fetch("https://accounts.spotify.com/api/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Authorization": "Basic " + btoa("dba648df53354f2c9eb79b293efd2f7b:e40e55c2d68a4b4094f87bd15ff24daa") // <-- Write there your data!
+        },
+        body: new URLSearchParams({
+          grant_type: "authorization_code",
+          code: code,
+          redirect_uri: "https://aresph0enix.github.io/Music_Reactive_Wallpaper/" // Must be the same with the Spotify one
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.access_token) {
+          localStorage.setItem("spotifyToken", data.access_token);
+          window.location.href = "index.html"; // Goes back to the visualizer
+        } else {
+          document.body.innerHTML = "<h1>Errore nell’autenticazione</h1><p>" + JSON.stringify(data) + "</p>";
+        }
+      })
+      .catch(err => {
+        document.body.innerHTML = "<h1>Errore rete</h1><p>" + err.message + "</p>";
+      });
     } else {
-      document.body.innerHTML = "<h1>Errore: codice non trovato</h1>";
+      document.body.innerHTML = "<h1>Codice non trovato</h1>";
     }
-    <script>
-  const token = window.location.hash.split("&")[0].split("=")[1];
-  localStorage.setItem("spotifyToken", token);
-  window.location.href = "index.html"; // Torna al sito principale
   </script>
 </body>
 </html>
